@@ -22,7 +22,7 @@ function App() {
         path="/user-dashboard"
         element={
           <ProtectedRoute requiredRole="user">
-            <KontrolnaTablaUserStranica />
+            <KontrolnaTablaUserStranica usersApi={usersApi} />
           </ProtectedRoute>
         }
       />

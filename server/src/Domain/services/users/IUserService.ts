@@ -5,4 +5,6 @@ export interface IUserService {
    * @returns Podatke o korisnicima u vidu liste.
    */
   getSviKorisnici(): Promise<UserDto[]>;
+  getSviAdmini(): Promise<UserDto[]>;
+  getSviObicniKorisnici(): Promise<UserDto[]>;
 }

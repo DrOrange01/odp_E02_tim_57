@@ -23,6 +23,20 @@ export class UserController {
       authorize("admin"),
       this.korisnici.bind(this)
     );
+
+    this.router.get(
+      "/users/admins",
+      authenticate,
+      authorize("admin"),
+      this.admini.bind(this)
+    );
+
+    this.router.get(
+      "/users/users",
+      authenticate,
+      authorize("user"),
+      this.obicniKorisnici.bind(this)
+    );
   }
 
   /**
@@ -36,6 +50,24 @@ export class UserController {
 
       res.status(200).json(korisniciPodaci);
       return;
+    } catch (error) {
+      res.status(500).json({ success: false, message: error });
+    }
+  }
+
+  private async admini(req: Request, res: Response): Promise<void> {
+    try {
+      const admini: UserDto[] = await this.userService.getSviAdmini();
+      res.status(200).json(admini);
+    } catch (error) {
+      res.status(500).json({ success: false, message: error });
+    }
+  }
+
+  private async obicniKorisnici(req: Request, res: Response): Promise<void> {
+    try {
+      const obicni: UserDto[] = await this.userService.getSviObicniKorisnici();
+      res.status(200).json(obicni);
     } catch (error) {
       res.status(500).json({ success: false, message: error });
     }

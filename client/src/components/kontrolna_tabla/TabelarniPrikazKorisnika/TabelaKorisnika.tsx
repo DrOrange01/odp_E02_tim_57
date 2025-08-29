@@ -7,9 +7,10 @@ import { ObrišiVrednostPoKljuču } from "../../../helpers/local_storage";
 
 interface TabelaKorisnikaProps {
   usersApi: IUsersAPIService;
+  role?: "admin" | "user";
 }
 
-export function TabelaKorisnika({ usersApi }: TabelaKorisnikaProps) {
+export function TabelaKorisnika({ usersApi, role }: TabelaKorisnikaProps) {
   const [korisnici, setKorisnici] = useState<UserDto[]>([]);
   const { token, logout } = useAuth();
 
@@ -20,10 +21,19 @@ export function TabelaKorisnika({ usersApi }: TabelaKorisnikaProps) {
 
   useEffect(() => {
     (async () => {
-      const data = await usersApi.getSviKorisnici(token ?? "");
+      let data;
+      if (role === "admin") {
+        data = await usersApi.getSviAdmini(token ?? "");
+        console.log("Fetchovao admine: ", data);
+      } else if (role === "user") {
+        data = await usersApi.getSviObicniKorisnici(token ?? "");
+        console.log("Fetchovao usere: ", data);
+      } else {
+        data = await usersApi.getSviKorisnici(token ?? "");
+      }
       setKorisnici(data);
     })();
-  }, [token, usersApi]);
+  }, [token, usersApi, role]);
 
   return (
     <div className="bg-white/30 backdrop-blur-lg border border-gray-300 shadow-xl rounded-2xl p-6 w-full max-w-4xl">

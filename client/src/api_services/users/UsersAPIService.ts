@@ -17,4 +17,29 @@ export const usersApi: IUsersAPIService = {
       return [];
     }
   },
+
+  async getSviAdmini(token: string): Promise<UserDto[]> {
+    try {
+      const res = await axios.get<UserDto[]>(`${API_URL}s/admins`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch {
+      return [];
+    }
+  },
+  async getSviObicniKorisnici(token: string): Promise<UserDto[]> {
+    try {
+      const res = await axios.get<UserDto[]>(`${API_URL}s/users`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    } catch {
+      return [];
+    }
+  },
 };

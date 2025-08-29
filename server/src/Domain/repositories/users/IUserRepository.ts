@@ -52,4 +52,11 @@ export interface IUserRepository {
    * @returns Promise koji vraća true ako korisnik postoji, false inače
    */
   exists(id: number): Promise<boolean>;
+
+  /**
+   * Vraća sve korisnike određene uloge (npr. "admin" ili "user")
+   * @param role - Uloga korisnika
+   * @returns Promise koji vraća niz korisnika sa zadatom ulogom
+   */
+  getByRole(role: string): Promise<User[]>;
 }

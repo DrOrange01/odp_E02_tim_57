@@ -61,9 +61,21 @@ export class UserRepository implements IUserRepository {
       return [];
     }
   }
+
+  async getByRole(role: string): Promise<User[]> {
+    try {
+      const query = `SELECT * FROM users WHERE uloga = ? ORDER BY id ASC`;
+      const [rows] = await db.execute<RowDataPacket[]>(query, [role]);
+      return rows.map(
+        (row) => new User(row.id, row.korisnickoIme, row.uloga, row.lozinka)
+      );
+    } catch {
+      return [];
+    }
+  }
   async update(user: User): Promise<User> {
     try {
-      const query = `UPDATE users SET korisnickoIme = ?, lozinka = ? WHERE id = ?`;
+      const query = `UPDATE users SET korisnickoIme = ?, lozinka = ?, uloga = ? WHERE id = ?`;
       const [result] = await db.execute<ResultSetHeader>(query, [
         user.korisnickoIme,
         user.lozinka,
