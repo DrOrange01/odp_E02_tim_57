@@ -7,6 +7,7 @@ import KontrolnaTablaUserStranica from "./pages/kontrolna_tabla/KontrolnaTablaUs
 import KontrolnaTablaAdminStranica from "./pages/kontrolna_tabla/KontrolnaTablaAdminStranica";
 import NotFoundStranica from "./pages/not_found/NotFoundPage";
 import { usersApi } from "./api_services/users/UsersAPIService";
+import { messageApi } from "./api_services/messages/MessageAPIService";
 
 function App() {
   return (
@@ -31,7 +32,10 @@ function App() {
         path="/admin-dashboard"
         element={
           <ProtectedRoute requiredRole="admin">
-            <KontrolnaTablaAdminStranica usersApi={usersApi} />
+            <KontrolnaTablaAdminStranica
+              usersApi={usersApi}
+              messageService={messageApi}
+            />
           </ProtectedRoute>
         }
       />

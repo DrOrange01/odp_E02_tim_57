@@ -5,32 +5,35 @@ import { RedUTabeliKorisnika } from "./RedUTabeliKorisnika";
 import { useAuth } from "../../../hooks/auth/UseAuthHook";
 import { ObrišiVrednostPoKljuču } from "../../../helpers/local_storage";
 
-interface TabelaKorisnikaProps {
+export interface TabelaKorisnikaProps {
   usersApi: IUsersAPIService;
   role?: "admin" | "user";
+  selectedUserId?: number | null;
+  onSelectUser: (user: UserDto) => void;
+  conversations: {
+    otherUserId: number;
+    lastMessage: string;
+    unreadCount: number;
+  }[];
 }
 
-export function TabelaKorisnika({ usersApi, role }: TabelaKorisnikaProps) {
+export function TabelaKorisnika({
+  usersApi,
+  role,
+  onSelectUser,
+  selectedUserId,
+  conversations,
+}: TabelaKorisnikaProps) {
   const [korisnici, setKorisnici] = useState<UserDto[]>([]);
-  const { token, logout } = useAuth();
-
-  const handleLogout = () => {
-    ObrišiVrednostPoKljuču("authToken");
-    logout();
-  };
+  const { token } = useAuth();
 
   useEffect(() => {
     (async () => {
-      let data;
-      if (role === "admin") {
-        data = await usersApi.getSviAdmini(token ?? "");
-        console.log("Fetchovao admine: ", data);
-      } else if (role === "user") {
+      let data: UserDto[] = [];
+      if (role === "admin") data = await usersApi.getSviAdmini(token ?? "");
+      else if (role === "user")
         data = await usersApi.getSviObicniKorisnici(token ?? "");
-        console.log("Fetchovao usere: ", data);
-      } else {
-        data = await usersApi.getSviKorisnici(token ?? "");
-      }
+      else data = await usersApi.getSviKorisnici(token ?? "");
       setKorisnici(data);
     })();
   }, [token, usersApi, role]);
@@ -41,18 +44,36 @@ export function TabelaKorisnika({ usersApi, role }: TabelaKorisnikaProps) {
         Списак корисника
       </h2>
       <table className="w-full table-auto border-collapse text-left">
-        <thead>
-          <tr className="text-gray-700 border-b border-gray-300">
-            <th className="px-4 py-2">ID</th>
-            <th className="px-4 py-2">Корисничко име</th>
-            <th className="px-4 py-2">Улога</th>
-          </tr>
-        </thead>
+        <thead></thead>
         <tbody>
           {korisnici.length > 0 ? (
-            korisnici.map((korisnik) => (
-              <RedUTabeliKorisnika key={korisnik.id} korisnik={korisnik} />
-            ))
+            korisnici.map((korisnik) => {
+              const conv = conversations.find(
+                (c) => c.otherUserId === korisnik.id
+              );
+              const unreadCount = conv?.unreadCount ?? 0;
+
+              return (
+                <tr
+                  key={korisnik.id}
+                  onClick={() => onSelectUser(korisnik)}
+                  className={`cursor-pointer ${
+                    selectedUserId === korisnik.id ? "bg-blue-100" : ""
+                  }`}
+                >
+                  <td className="px-4 py-2">{korisnik.id}</td>
+                  <td className="px-4 py-2 flex items-center justify-between">
+                    {korisnik.korisnickoIme}
+                    {unreadCount > 0 && (
+                      <span className="ml-2 text-xs px-2 py-1 bg-red-500 text-white rounded-full">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-2">{korisnik.uloga}</td>
+                </tr>
+              );
+            })
           ) : (
             <tr>
               <td colSpan={3} className="text-center text-gray-500 py-4">
@@ -62,13 +83,6 @@ export function TabelaKorisnika({ usersApi, role }: TabelaKorisnikaProps) {
           )}
         </tbody>
       </table>
-
-      <button
-        onClick={handleLogout}
-        className="mt-8 px-4 bg-red-700/60 hover:bg-red-700/70 text-white py-2 rounded-xl ransition"
-      >
-        Напусти контролну таблу
-      </button>
     </div>
   );
 }
