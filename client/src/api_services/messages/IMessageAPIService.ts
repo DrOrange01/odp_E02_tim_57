@@ -15,4 +15,8 @@ export interface IMessageAPIService {
     otherUserId: number
   ): Promise<{ success: boolean; data: Message[] }>;
   markAsRead(token: string, messageId: number): Promise<{ success: boolean }>;
+  markAllAsRead(
+    token: string,
+    otherUserId: number
+  ): Promise<{ success: boolean }>;
 }

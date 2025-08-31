@@ -51,4 +51,16 @@ export const messageApi: IMessageAPIService = {
     );
     return res.data;
   },
+
+  async markAllAsRead(
+    token: string,
+    otherUserId: number
+  ): Promise<{ success: boolean }> {
+    const res = await axios.post(
+      `${API_URL}/mark-all-read`,
+      { otherUserId },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return { success: res.data.success };
+  },
 };

@@ -5,7 +5,10 @@ import db from "../../connection/DbConnectionPool";
 export class UserRepository implements IUserRepository {
   async create(user: User): Promise<User> {
     try {
-      const query = `INSERT INTO users (korisnickoIme, uloga, lozinka) VALUES (?, ?, ?)`;
+      const query = `
+        INSERT INTO users (korisnickoIme, uloga, lozinka)
+        VALUES (?, ?, ?)
+      `;
       const [result] = await db.execute<ResultSetHeader>(query, [
         user.korisnickoIme,
         user.uloga,
@@ -16,7 +19,11 @@ export class UserRepository implements IUserRepository {
           result.insertId,
           user.korisnickoIme,
           user.uloga,
-          user.lozinka
+          user.lozinka,
+          "",
+          "",
+          "",
+          ""
         );
       return new User();
     } catch {
@@ -29,7 +36,16 @@ export class UserRepository implements IUserRepository {
       const [rows] = await db.execute<RowDataPacket[]>(query, [id]);
       if (rows.length > 0) {
         const row = rows[0]!;
-        return new User(row.id, row.korisnickoIme, row.uloga, row.lozinka);
+        return new User(
+          row.id,
+          row.korisnickoIme,
+          row.uloga,
+          row.lozinka,
+          row.first_name,
+          row.last_name,
+          row.phone_number,
+          row.profile_pic
+        );
       }
       return new User();
     } catch {
@@ -55,7 +71,17 @@ export class UserRepository implements IUserRepository {
       const query = `SELECT * FROM users ORDER BY id ASC`;
       const [rows] = await db.execute<RowDataPacket[]>(query);
       return rows.map(
-        (row) => new User(row.id, row.korisnickoIme, row.uloga, row.lozinka)
+        (row) =>
+          new User(
+            row.id,
+            row.korisnickoIme,
+            row.uloga,
+            row.lozinka,
+            row.first_name,
+            row.last_name,
+            row.phone_number,
+            row.profile_pic
+          )
       );
     } catch {
       return [];
@@ -66,8 +92,19 @@ export class UserRepository implements IUserRepository {
     try {
       const query = `SELECT * FROM users WHERE uloga = ? ORDER BY id ASC`;
       const [rows] = await db.execute<RowDataPacket[]>(query, [role]);
+      console.log("DB rows for role", role, rows);
       return rows.map(
-        (row) => new User(row.id, row.korisnickoIme, row.uloga, row.lozinka)
+        (row) =>
+          new User(
+            row.id,
+            row.korisnickoIme,
+            row.uloga,
+            row.lozinka,
+            row.first_name,
+            row.last_name,
+            row.phone_number,
+            row.profile_pic
+          )
       );
     } catch {
       return [];
@@ -75,11 +112,16 @@ export class UserRepository implements IUserRepository {
   }
   async update(user: User): Promise<User> {
     try {
-      const query = `UPDATE users SET korisnickoIme = ?, lozinka = ?, uloga = ? WHERE id = ?`;
+      const query = `
+        UPDATE users 
+        SET first_name = ?, last_name = ?, phone_number = ?, profile_pic = ?
+        WHERE id = ?
+      `;
       const [result] = await db.execute<ResultSetHeader>(query, [
-        user.korisnickoIme,
-        user.lozinka,
-        user.uloga,
+        user.first_name,
+        user.last_name,
+        user.phone_number,
+        user.profile_pic,
         user.id,
       ]);
       if (result.affectedRows > 0) return user;
@@ -87,6 +129,27 @@ export class UserRepository implements IUserRepository {
     } catch {
       return new User();
     }
+  }
+
+  async updatePartial(userId: number, data: Partial<User>): Promise<User> {
+    const fields: string[] = [];
+    const values: any[] = [];
+
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined) {
+        fields.push(`${key} = ?`);
+        values.push(value);
+      }
+    }
+
+    if (fields.length === 0) return this.getById(userId);
+
+    const query = `UPDATE users SET ${fields.join(", ")} WHERE id = ?`;
+    values.push(userId);
+
+    const [result] = await db.execute<ResultSetHeader>(query, values);
+
+    return this.getById(userId);
   }
   async delete(id: number): Promise<boolean> {
     try {

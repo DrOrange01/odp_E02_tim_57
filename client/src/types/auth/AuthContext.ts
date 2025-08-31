@@ -7,4 +7,5 @@ export type AuthContextType = {
   logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
+  setUser: (user: AuthUser) => void;
 };

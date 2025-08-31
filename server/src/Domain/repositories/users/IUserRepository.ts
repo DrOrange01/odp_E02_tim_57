@@ -40,6 +40,14 @@ export interface IUserRepository {
   update(user: User): Promise<User>;
 
   /**
+   * Ažurira korisnika samo sa poljima koja su prosleđena
+   * @param id - ID korisnika
+   * @param data - Delimični objekat korisnika sa poljima za ažuriranje
+   * @returns Promise koji vraća ažuriranog korisnika
+   */
+  updatePartial(id: number, data: Partial<User>): Promise<User>;
+
+  /**
    * Briše korisnika iz baze podataka
    * @param id - ID korisnika za brisanje
    * @returns Promise koji vraća true ako je brisanje uspešno, false inače

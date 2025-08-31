@@ -42,6 +42,13 @@ export class MessageController {
       authorize("admin", "user"),
       this.markAsRead.bind(this)
     );
+
+    this.router.post(
+      "/messages/mark-all-read",
+      authenticate,
+      authorize("admin", "user"),
+      this.markAllAsRead.bind(this)
+    );
   }
 
   private async sendMessage(req: Request, res: Response): Promise<void> {
@@ -122,6 +129,26 @@ export class MessageController {
       );
 
       res.status(200).json({ success });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error });
+    }
+  }
+
+  private async markAllAsRead(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const { otherUserId } = req.body;
+
+      if (!otherUserId) {
+        res
+          .status(400)
+          .json({ success: false, message: "Missing otherUserId" });
+        return;
+      }
+
+      await this.messageService.markAllMessagesAsRead(userId, otherUserId);
+
+      res.status(200).json({ success: true });
     } catch (error) {
       res.status(500).json({ success: false, message: error });
     }

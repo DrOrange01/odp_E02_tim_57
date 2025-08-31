@@ -5,7 +5,7 @@ import { useAuth } from "../../hooks/auth/UseAuthHook";
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
-  requiredRole: string;
+  requiredRole?: string;
   redirectTo?: string;
 };
 

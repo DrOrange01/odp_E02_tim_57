@@ -16,4 +16,5 @@ export interface IMessageRepository {
     otherUserId: number
   ): Promise<Message[]>;
   markAsRead(userId: number, messageId: number): Promise<boolean>;
+  markAllAsRead(userId: number, otherUserId: number): Promise<void>;
 }

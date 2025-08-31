@@ -5,6 +5,7 @@ import PrijavaStranica from "./pages/auth/PrijavaStranica";
 import RegistracijaStranica from "./pages/auth/RegistracijaStranica";
 import KontrolnaTablaUserStranica from "./pages/kontrolna_tabla/KontrolnaTablaUserStranica";
 import KontrolnaTablaAdminStranica from "./pages/kontrolna_tabla/KontrolnaTablaAdminStranica";
+import ProfilnaStranica from "./pages/profile/ProfilnaStranica";
 import NotFoundStranica from "./pages/not_found/NotFoundPage";
 import { usersApi } from "./api_services/users/UsersAPIService";
 import { messageApi } from "./api_services/messages/MessageAPIService";
@@ -23,7 +24,10 @@ function App() {
         path="/user-dashboard"
         element={
           <ProtectedRoute requiredRole="user">
-            <KontrolnaTablaUserStranica usersApi={usersApi} />
+            <KontrolnaTablaUserStranica
+              usersApi={usersApi}
+              messageService={messageApi}
+            />
           </ProtectedRoute>
         }
       />
@@ -36,6 +40,14 @@ function App() {
               usersApi={usersApi}
               messageService={messageApi}
             />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile-"
+        element={
+          <ProtectedRoute>
+            <ProfilnaStranica />
           </ProtectedRoute>
         }
       />

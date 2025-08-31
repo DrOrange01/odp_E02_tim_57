@@ -16,4 +16,5 @@ export interface IMessageService {
     otherUserId: number
   ): Promise<Message[]>;
   markMessageAsRead(userId: number, messageId: number): Promise<boolean>;
+  markAllMessagesAsRead(userId: number, otherUserId: number): Promise<void>;
 }

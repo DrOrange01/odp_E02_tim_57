@@ -7,9 +7,10 @@ import type { JwtTokenClaims } from "../../types/auth/JwtTokenClaims";
 interface Props {
   token: string;
   otherUserId: number;
+  onMessagesRead?: () => void; // <-- callback to parent
 }
 
-export function ChatWindow({ token, otherUserId }: Props) {
+export function ChatWindow({ token, otherUserId, onMessagesRead }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
 
@@ -19,17 +20,23 @@ export function ChatWindow({ token, otherUserId }: Props) {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
+        // Get messages
         const res = await messageApi.getConversationMessages(
           token,
           otherUserId
         );
-
         const fetchedMessages: Message[] = Array.isArray(res)
           ? res
           : Array.isArray(res.data)
           ? res.data
           : [];
         setMessages(fetchedMessages.filter(Boolean));
+
+        // Mark all as read
+        await messageApi.markAllAsRead(token, otherUserId);
+
+        // Tell parent to refresh conversation list (unread count)
+        onMessagesRead?.();
       } catch (err) {
         console.error("Failed to fetch messages:", err);
         setMessages([]);
@@ -63,7 +70,6 @@ export function ChatWindow({ token, otherUserId }: Props) {
         otherUserId,
         trimmed
       );
-
       const savedMessage: Message =
         (savedMessageRaw as any)?.data ?? (savedMessageRaw as Message);
 
@@ -76,7 +82,6 @@ export function ChatWindow({ token, otherUserId }: Props) {
       }
     } catch (err) {
       console.error("Failed to send message:", err);
-
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
     }
   };

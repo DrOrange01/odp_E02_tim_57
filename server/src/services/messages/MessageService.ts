@@ -38,4 +38,10 @@ export class MessageService implements IMessageService {
   async markMessageAsRead(userId: number, messageId: number): Promise<boolean> {
     return await this.messageRepository.markAsRead(userId, messageId);
   }
+  async markAllMessagesAsRead(
+    userId: number,
+    otherUserId: number
+  ): Promise<void> {
+    return this.messageRepository.markAllAsRead(userId, otherUserId);
+  }
 }

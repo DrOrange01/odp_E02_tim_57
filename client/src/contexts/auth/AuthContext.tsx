@@ -21,7 +21,6 @@ const decodeJWT = (token: string): JwtTokenClaims | null => {
   try {
     const decoded = jwtDecode<JwtTokenClaims>(token);
 
-    // Proveri da li token ima potrebna polja
     if (decoded.id && decoded.korisnickoIme && decoded.uloga) {
       return {
         id: decoded.id,
@@ -42,7 +41,6 @@ const isTokenExpired = (token: string): boolean => {
   try {
     const decoded = jwtDecode(token);
     const currentTime = Date.now() / 1000;
-
     return decoded.exp ? decoded.exp < currentTime : false;
   } catch {
     return true;
@@ -56,12 +54,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Učitaj token iz localStorage pri pokretanju
+  // Load token and user from localStorage
   useEffect(() => {
     const savedToken = PročitajVrednostPoKljuču("authToken");
 
     if (savedToken) {
-      // Proveri da li je token istekao
       if (isTokenExpired(savedToken)) {
         ObrišiVrednostPoKljuču("authToken");
         setIsLoading(false);
@@ -75,6 +72,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           id: claims.id,
           korisnickoIme: claims.korisnickoIme,
           uloga: claims.uloga,
+          first_name: "",
+          last_name: "",
+          phone_number: "",
+          profile_pic: "",
         });
       } else {
         ObrišiVrednostPoKljuču("authToken");
@@ -93,6 +94,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         id: claims.id,
         korisnickoIme: claims.korisnickoIme,
         uloga: claims.uloga,
+        first_name: "",
+        last_name: "",
+        phone_number: "",
+        profile_pic: "",
       });
       SačuvajVrednostPoKljuču("authToken", newToken);
     } else {
@@ -115,6 +120,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     logout,
     isAuthenticated,
     isLoading,
+    setUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
