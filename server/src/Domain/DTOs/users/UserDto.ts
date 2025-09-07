@@ -6,6 +6,6 @@ export class UserDto {
     public first_name: string = "",
     public last_name: string = "",
     public phone_number: string = "",
-    public profile_picture: string = ""
+    public profile_pic: string = ""
   ) {}
 }
