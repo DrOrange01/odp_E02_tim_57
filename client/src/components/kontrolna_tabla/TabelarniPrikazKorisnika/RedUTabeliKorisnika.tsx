@@ -1,4 +1,4 @@
-import type { UserDto } from "../../../models/users/UserDto";
+ import type { UserDto } from "../../../models/users/UserDto";
 
 interface RedUTabeliKorisnikaProps {
   korisnik: UserDto;
@@ -13,6 +13,12 @@ export function RedUTabeliKorisnika({
   isSelected,
   unreadCount = 0,
 }: RedUTabeliKorisnikaProps) {
+  const backendUrl = "http://localhost:4000";
+
+  const profilePicUrl = korisnik.profile_pic
+    ? `${backendUrl}${korisnik.profile_pic.replace(/^\/+/, "/")}`
+    : null;
+
   return (
     <tr
       onClick={() => onSelectUser?.(korisnik)}
@@ -25,9 +31,9 @@ export function RedUTabeliKorisnika({
       <td className="px-4 py-2">{korisnik.last_name}</td>
       <td className="px-4 py-2">{korisnik.phone_number}</td>
       <td className="px-4 py-2">
-        {korisnik.profile_pic ? (
+        {profilePicUrl ? (
           <img
-            src={korisnik.profile_pic}
+            src={profilePicUrl}
             alt="Profile"
             className="w-10 h-10 rounded-full object-cover"
           />
@@ -44,4 +50,4 @@ export function RedUTabeliKorisnika({
       </td>
     </tr>
   );
-}
+} 

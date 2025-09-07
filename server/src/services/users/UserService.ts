@@ -1,33 +1,64 @@
-import { UserDto } from "../../Domain/DTOs/users/UserDto";
+ import { UserDto } from "../../Domain/DTOs/users/UserDto";
 import { User } from "../../Domain/models/User";
 import type { IUserRepository } from "../../Domain/repositories/users/IUserRepository";
 import type { IUserService } from "../../Domain/services/users/IUserService";
+import type { IFileStorageService } from "../../Domain/services/files/IFileStorageService";
+import type multer from "multer";
 
 export class UserService implements IUserService {
-  public constructor(private userRepository: IUserRepository) {}
+  public constructor(
+    private userRepository: IUserRepository,
+    private fileStorage: IFileStorageService
+  ) {}
 
   async getSviKorisnici(): Promise<UserDto[]> {
     const korisnici: User[] = await this.userRepository.getAll();
     return korisnici.map(
-      (user) => new UserDto(user.id, user.korisnickoIme, user.uloga)
+      (u) =>
+        new UserDto(
+          u.id,
+          u.korisnickoIme,
+          u.uloga,
+          u.first_name,
+          u.last_name,
+          u.phone_number,
+          u.profile_pic
+        )
     );
   }
 
   async getSviAdmini(): Promise<UserDto[]> {
     const admini: User[] = await this.userRepository.getByRole("admin");
     return admini.map(
-      (user) => new UserDto(user.id, user.korisnickoIme, user.uloga)
+      (u) =>
+        new UserDto(
+          u.id,
+          u.korisnickoIme,
+          u.uloga,
+          u.first_name,
+          u.last_name,
+          u.phone_number,
+          u.profile_pic
+        )
     );
   }
-
-  async getSviAdminiFull(): Promise<User[]> {
+   async getSviAdminiFull(): Promise<User[]> {
     return await this.userRepository.getByRole("admin");
   }
 
   async getSviObicniKorisnici(): Promise<UserDto[]> {
     const obicniKorisnici: User[] = await this.userRepository.getByRole("user");
     return obicniKorisnici.map(
-      (user) => new UserDto(user.id, user.korisnickoIme, user.uloga)
+      (u) =>
+        new UserDto(
+          u.id,
+          u.korisnickoIme,
+          u.uloga,
+          u.first_name,
+          u.last_name,
+          u.phone_number,
+          u.profile_pic
+        )
     );
   }
 
@@ -47,4 +78,4 @@ export class UserService implements IUserService {
       updatedUser.profile_pic
     );
   }
-}
+} 

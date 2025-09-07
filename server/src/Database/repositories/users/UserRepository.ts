@@ -132,22 +132,34 @@ export class UserRepository implements IUserRepository {
   }
 
   async updatePartial(userId: number, data: Partial<User>): Promise<User> {
+    const allowedFields = [
+      "korisnickoIme",
+      "uloga",
+      "lozinka",
+      "first_name",
+      "last_name",
+      "phone_number",
+      "profile_pic",
+    ];
+
     const fields: string[] = [];
     const values: any[] = [];
 
     for (const [key, value] of Object.entries(data)) {
-      if (value !== undefined) {
+      if (value !== undefined && allowedFields.includes(key)) {
         fields.push(`${key} = ?`);
         values.push(value);
       }
     }
 
-    if (fields.length === 0) return this.getById(userId);
+    if (fields.length === 0) {
+      return this.getById(userId);
+    }
 
     const query = `UPDATE users SET ${fields.join(", ")} WHERE id = ?`;
     values.push(userId);
 
-    const [result] = await db.execute<ResultSetHeader>(query, values);
+    await db.execute<ResultSetHeader>(query, values);
 
     return this.getById(userId);
   }
